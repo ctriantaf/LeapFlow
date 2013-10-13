@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import sys, os
-from PyQt4.QtGui import QMainWindow, QApplication, QPixmap, QImage, QListWidget, QListWidgetItem, QIcon, QLabel
+from PyQt4.QtGui import (QMainWindow, QApplication, QPixmap, QImage, QListWidget, QListWidgetItem, QIcon, QLabel, QStackedWidget,
+						QGraphicsScene, QGraphicsView)
 from PyQt4.QtCore import SIGNAL, QThread, QSize
 
 threads = []
@@ -17,6 +18,7 @@ class LeapFlow (QMainWindow):
 		self.list_view = QListWidget ()
 		self.list_view.setFlow (0)
 		self.list_view.setHorizontalScrollMode (1)
+		self.list_view.itemClicked.connect (self.show_image)
 		self.list_view.setStyleSheet ("""
 				QListWidget::item:hover {background: transparent;}
 				QListWidget::item:disabled:hover {background: transparent;}
@@ -25,29 +27,21 @@ class LeapFlow (QMainWindow):
 	            QListWidget::item:selected:!active {background: transparent;}
 	            QListWidget::item:selected:disabled {background: transparent;}
 	            QListWidget::item:selected:!disabled {background: transparent;}
+	            QListWidget {background: #2C3539}
 			""")
 
-		# self.list_view.horizontalScrollBar ().setStyleSheet ("""
-		# 		QScrollBar:horizontal {
-		# 			border: 2px #2C3539;
-		# 		    background: #2C3539;
-		# 		    height: 15px;
-		# 		    border-radius: 10
-		# 		    margin: 0px 20px 0 20px;
-		# 		}
-		# 		QScrollBar::handle:horizontal {
-		# 		    background: #413839;
-		# 		    color: #413839;
-		# 		    min-width: 20px;
-		# 		    border-radius: 10
-		# 		}
-		# 	""")
+		self.scene = QGraphicsScene ()
+		self.viewer = QGraphicsView (self.scene)
 
-		self.setCentralWidget (self.list_view)
+		self.stackedWidget = QStackedWidget ()
+		self.stackedWidget.addWidget (self.list_view)
+		self.stackedWidget.addWidget (self.viewer)
+
+		self.setCentralWidget (self.stackedWidget)
 		self.resize (500, 400)
 		self.showMaximized ()
 
-		scan = ScanLibrary ("/home/chris/Pictures")
+		scan = ScanLibrary ("/home/chris/Example")
 		threads.append (scan)
 		self.connect (scan, SIGNAL (scan.signal), self.add_images_to_list)
 		scan.start ()
@@ -59,8 +53,12 @@ class LeapFlow (QMainWindow):
 			label = QLabel ()
 			label.setPixmap (pixmap.scaled (600, 400))
 			item.setSizeHint (label.sizeHint ())
+			item.setData (0, library[image])
 			self.list_view.addItem (item)
 			self.list_view.setItemWidget (item, label)
+
+	def show_image (self, item):
+		pass
 
 class ScanLibrary (QThread):
 
