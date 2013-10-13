@@ -16,10 +16,36 @@ class LeapFlow (QMainWindow):
 
 		self.list_view = QListWidget ()
 		self.list_view.setFlow (0)
+		self.list_view.setHorizontalScrollMode (1)
+		self.list_view.setStyleSheet ("""
+				QListWidget::item:hover {background: transparent;}
+				QListWidget::item:disabled:hover {background: transparent;}
+				QListWidget::item:hover:!active {background: transparent;}
+				QListWidget::item:selected:active {background: transparent;}
+	            QListWidget::item:selected:!active {background: transparent;}
+	            QListWidget::item:selected:disabled {background: transparent;}
+	            QListWidget::item:selected:!disabled {background: transparent;}
+			""")
+
+		# self.list_view.horizontalScrollBar ().setStyleSheet ("""
+		# 		QScrollBar:horizontal {
+		# 			border: 2px #2C3539;
+		# 		    background: #2C3539;
+		# 		    height: 15px;
+		# 		    border-radius: 10
+		# 		    margin: 0px 20px 0 20px;
+		# 		}
+		# 		QScrollBar::handle:horizontal {
+		# 		    background: #413839;
+		# 		    color: #413839;
+		# 		    min-width: 20px;
+		# 		    border-radius: 10
+		# 		}
+		# 	""")
 
 		self.setCentralWidget (self.list_view)
 		self.resize (500, 400)
-		self.show ()
+		self.showMaximized ()
 
 		scan = ScanLibrary ("/home/chris/Pictures")
 		threads.append (scan)
@@ -31,7 +57,7 @@ class LeapFlow (QMainWindow):
 			item = QListWidgetItem ()
 			pixmap = QPixmap.fromImage (QImage (library[image]))
 			label = QLabel ()
-			label.setPixmap (pixmap.scaled (200, 200))
+			label.setPixmap (pixmap.scaled (600, 400))
 			item.setSizeHint (label.sizeHint ())
 			self.list_view.addItem (item)
 			self.list_view.setItemWidget (item, label)
