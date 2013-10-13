@@ -1,0 +1,1 @@
+Image gallery app controlled by Leap gestures
